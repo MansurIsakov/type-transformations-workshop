@@ -1,10 +1,15 @@
 import { Equal, Expect } from "../helpers/type-utils";
+import { S } from "ts-toolbelt";
 
 type UserPath = "/users/:id";
 
 type UserOrganisationPath = "/users/:id/organisations/:organisationId";
 
-type ExtractPathParams = unknown;
+type ExtractPathParams<Path extends string> = {
+  [K in S.Split<Path, "/">[number] as K extends `:${infer R}`
+    ? R
+    : never]: string;
+};
 
 type tests = [
   Expect<Equal<ExtractPathParams<UserPath>, { id: string }>>,
@@ -13,5 +18,5 @@ type tests = [
       ExtractPathParams<UserOrganisationPath>,
       { id: string; organisationId: string }
     >
-  >,
+  >
 ];
